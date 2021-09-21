@@ -10,8 +10,8 @@ namespace SerialNumberCheckup
     {
         static async Task Main(string[] args)
         {
-            var jwt = "<TOKEN>";
-            var api = new RestClient("<BASE_URL>").For<ISnipeItApi>();
+            var jwt = "<API_TOKEN>";
+            var api = new RestClient("<API_BASE_URL>").For<ISnipeItApi>();
 
             api.Authorization = $"Bearer {jwt}";
 
@@ -38,6 +38,13 @@ namespace SerialNumberCheckup
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine("Hardware is already known.");
+                        
+                        
+                        var id = responseObject["id"]!.Value<int>();
+                        //Should parse id of object, didnt
+                        
+                        var idLink = "<BASE_URL>/hardware/" + id;
+                        System.Diagnostics.Process.Start(idLink);
                         continue;
                     }
                 }
