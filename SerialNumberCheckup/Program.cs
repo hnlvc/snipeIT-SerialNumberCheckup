@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace SerialNumberCheckup
 {
@@ -10,7 +11,7 @@ namespace SerialNumberCheckup
     {
         static async Task Main(string[] args)
         {
-            var jwt = "<TOKEN>";
+            var jwt = "<API_TOKEN>";
             var api = new RestClient("<BASE_URL>").For<ISnipeItApi>();
 
             api.Authorization = $"Bearer {jwt}";
@@ -20,7 +21,7 @@ namespace SerialNumberCheckup
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 var input = Console.ReadLine();
-                var creationSucceeded = StickerContent.TryCreateInstanceFromString(input, out var stickerContent);
+                var creationSucceeded = StickerContent.TryCreateInstanceFromString(input!, out var stickerContent);
                 if (!creationSucceeded)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -28,7 +29,7 @@ namespace SerialNumberCheckup
                     continue;
                 }
 
-                var response = await api.GetHardwareBySerialnumber(stickerContent.SerialNumber.Value);
+                var response = await api.GetHardwareBySerialnumber(stickerContent!.SerialNumber.Value);
                 if (response.ResponseMessage.StatusCode == HttpStatusCode.OK)
                 {
                     var responseObject = JObject.Parse(response.StringContent!);
@@ -38,6 +39,16 @@ namespace SerialNumberCheckup
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
                         Console.WriteLine("Hardware is already known.");
+
+
+                        var id = responseObject["rows"][0].Value<int>("id");
+                        //Should parse id of object, didnt
+
+                        var uri = "<BASE_URL_SLASH_HARDWARE>" + id;
+                        var psi = new System.Diagnostics.ProcessStartInfo();
+                        psi.UseShellExecute = true;
+                        psi.FileName = uri;
+                        Process.Start(psi);
                         continue;
                     }
                 }
