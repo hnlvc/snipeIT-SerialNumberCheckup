@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.IO;
 
 namespace SerialNumberCheckup
 {
@@ -11,8 +12,12 @@ namespace SerialNumberCheckup
     {
         static async Task Main(string[] args)
         {
-            var jwt = "<API_TOKEN>";
-            var api = new RestClient("<BASE_URL>").For<ISnipeItApi>();
+            var apiSr = new StreamReader("apitoken.csv");
+            var urlSr = new StreamReader("url.csv");
+            string? url = await urlSr.ReadLineAsync();
+            var api = new RestClient(url).For<ISnipeItApi>();
+            string? jwt = await apiSr.ReadLineAsync();
+
 
             api.Authorization = $"Bearer {jwt}";
 
